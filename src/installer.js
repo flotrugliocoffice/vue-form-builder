@@ -36,6 +36,11 @@ const VueFormBuilderInstaller = function(
         extendingControls(properties.controls)
     }
 
+    // controls override?
+    if (properties.hasOwnProperty('overridecontrols')) {
+        overrideControls(properties.overridecontrols)
+    }
+
     // style override?
     if (properties.hasOwnProperty('styles')) {
         Object.assign(STYLES, properties.styles)
@@ -92,6 +97,32 @@ const extendingControls = function(moreControlObject) {
 
     // eligible to extend now
     Object.assign(CONTROLS, moreControlObject)
+}
+
+
+
+/**
+ * Override existing Control from the users
+ * @param {Object} moreControlObject
+ */
+const overrideControls = function(moreControlObject) {
+    // validation if it does conflict or not
+    const allKeys = Object.keys(moreControlObject)
+    for (let iKey = 0; iKey < allKeys.length; iKey++) {
+        let key = allKeys[iKey]
+
+        // se lo trovi sostituisci i valori.
+        if (CONTROLS.hasOwnProperty(key)) {
+            let currentControl = CONTROLS[key];
+            let overrideProperty = moreControlObject[key];
+            const _keys = Object.keys(overrideProperty);
+            _keys.forEach((k)=>{
+                currentControl[k] = overrideControls([k]);
+            });
+
+            CONTROLS[key] = currentControl; //Replace
+        }
+    }
 }
 
 /**
